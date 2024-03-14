@@ -56,7 +56,7 @@ class Hole_center():
         
         for index in range(len(point_dict['start'])):
             
-            coordinate_Vec3 = ( float(point_dict['start'][index]['X']),             # Конвертация X координаты для начальной позиции
+            coordinate_Vec3 = ( float(point_dict['start'][index]['X']),             # Конвертация X координатдля начальной позиции
                                 float(point_dict['start'][index]['Y']),             # Конвертация Y координаты для начальной позиции
                                 float(point_dict['start'][index]['Z']))             # Конвертация Z координаты для начальной позиции
 
