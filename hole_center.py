@@ -8,8 +8,9 @@ class Hole_center():
     
     def __init__(self, json_path:str=None, input_coordinate_dict:dict=None,) -> None:
         self.json_path = json_path
-        self.input_coordinate_dict = input_coordinate_dict
-        
+        self.input_coordinate_dict = input_coordinate_dict     
+    
+    
     # Распоковщик json файла
     def unpucking_json(self,) -> dict:
         """
@@ -47,7 +48,6 @@ class Hole_center():
             self.point_dict = self.input_coordinate_dict
     
     
-    
     # Генерация списка созданных обьектов
     def generate_entity_point_group(self) -> dict:
         
@@ -78,12 +78,55 @@ class Hole_center():
         self.object_point_dict = object_dict
         
         return object_dict
-        
     
+    
+    # Создает связи между точками
+    def generate_connections_with_points(self, color_connection:ursina.color.Color=ursina.color.pink) -> list:
+        
+        point_dict = self.point_dict
+        connection_list = []
+        
+        print(type(point_dict['start']), "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
+
+        
+        # Создание точек и 
+        for index_hole in range(len(point_dict['start'])):
+            
+            start_point_coordinate = [float(point_dict['start'][index_hole]['X']), # получение начальной координаты по оси X
+                                      float(point_dict['start'][index_hole]['Y']), # получение начальной координаты по оси Y
+                                      float(point_dict['start'][index_hole]['Z'])] # получение начальной координаты по оси Z
+            
+            end_point_coordinate  =  [float(point_dict['end'][index_hole]['X']),   # получение конечной координаты по оси X
+                                      float(point_dict['end'][index_hole]['Y']),   # получение конечной координаты по оси Y
+                                      float(point_dict['end'][index_hole]['Z'])]   # получение конечной координаты по оси Z
+            
+            # Получение координаты повнаправление цилиндра (координаты конца - координаты начала)
+            turn_coordinate =  np.subtract(np.array(end_point_coordinate), np.array(start_point_coordinate))
+            
+            # Создание обьекта Цилиндр по заданными параметрам
+            connection = ursina.Entity(model=ursina.Cylinder(6, direction=turn_coordinate), position=start_point_coordinate, color=color_connection)
+            
+            connection_list = connection_list.append(connection)
+        
+        self.connection_list = connection_list
+        
+        return connection_list
+        
+                    
     def main(self,):
         
-        self.unpucking_json() # распаковываем json
-        object_list = self.generate_entity_point_group() #создаем список Entity точек центров отверстий 
+        #Список всех обьектов    
+        object_list = []
+        
+        # распаковываем json
+        self.unpucking_json() 
+    
+        #создаем список Entity точек центров отверстий 
+        entity_point_group = self.generate_entity_point_group() 
+        connections_points = self.generate_connections_with_points()
+        
+        #Заполнение списка обьектов
+        object_list.extend(entity_point_group,connections_points)
         
         return object_list
         
