@@ -1,8 +1,9 @@
 #endoscope.py
 
 import ursina
-import numpy
+import numpy as np
 import json
+
 from hole_center import Hole_center
 
 class Endoscope():
@@ -80,7 +81,7 @@ class Endoscope():
         self.vec_3_point_dict = vec_3_point_dict
         self.hole_counter = len(point_dict['start'])
         self.pints_counter = len(point_dict['start']) * 2 # так как у отверстия есть вход и выход
-    
+     
     
     # Получение координат точек c point_objects_list
     def get_point_objects_coordinate(self,) -> None:
@@ -107,7 +108,26 @@ class Endoscope():
         self.coordinate_point_dict = coordinate_point_dict
         
         
+    # Создание эндоскопа
+    def create_endoscope(self, start_coordinate:dict, end_coordinate:dict):
+        
+        #  Вычисление смещения 
+        direction = np.subtract(np.array(end_coordinate), np.array(start_coordinate))
+        
+        # Создание обьекта эндоскопа
+        endoscope = ursina.Entity(model=ursina.Cylinder(resolution=8,                 # Количество граней
+                                                        radius=self.radius_endoscope, # Конечная координата:tuple(x,y,z)
+                                                        height=self.len_endoscope,    # Длина обьекта
+                                                        direction=direction),         # Направление
+                                  position=(start_coordinate))                        # Позиция  начала
+        
+        return endoscope
     
+    # Вычисление конечных координат эндоскопа
+    def calculate_end_coordinate_position_endoscope(self, start_coordinate_endoscope:dict, start coordinare):
+        pass
+    
+    # Основная функция
     def main(self,):
         
         #Список всех обьектов    
