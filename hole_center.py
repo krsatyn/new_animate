@@ -1,8 +1,10 @@
-#hole center
+#hole_center.py
 
 import ursina
 import json
 import numpy as np
+
+'''Проверитиь под входной словарик'''
 
 class Hole_center():
     
@@ -19,8 +21,8 @@ class Hole_center():
         !!! len(input_coordinate_dict[start]) и len(input_coordinate_dict[end]) должно быть равным иначе произойдет ошибка!!!
         
         dict{
-                "start":[{'X':float, 'Y':float,'Z':float}, next_point],
-                "end":  [{'X':float, 'Y':float,'Z':float}, next_point]
+                "start":[{'X':float, 'Y':float,'Z':float},],
+                "end":  [{'X':float, 'Y':float,'Z':float},]
         }
         
         """
