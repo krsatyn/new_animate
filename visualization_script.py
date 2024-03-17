@@ -44,7 +44,7 @@ encp = Endoscope(json_path=endoscope_coordinate_path, point_objects_list=object_
 encp.main()
 
 # Деталь
-#detail = ursina.Entity(model=model_path, color = ursina.color.hsv(0, 0, 1, .5))
+detail = ursina.Entity(model=model_path, color = ursina.color.hsv(0, 0, 1, .5))
 
 # Камера 
 ursina.EditorCamera()

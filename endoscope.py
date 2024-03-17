@@ -22,6 +22,9 @@ class Endoscope():
         self.len_endoscope = len_endoscope                 # Длина эндоскопа
         self.point_objects_list = point_objects_list       # Список обьектов
         
+    def update():
+        print(1)
+    
     # Распоковщик json файла
     def unpucking_json(self,) -> dict:
         """
@@ -37,23 +40,27 @@ class Endoscope():
         """
         start_coordinates = []
         end_coordinates   = []
+        phi_angles = []
+        psi_angles = []
+        
         
         if self.json_path is not(None):
             
             #Считывание с json файла    ян
             with open(self.json_path) as json_file:
                 coordinate_dict = json.load(json_file)
-        
+
             #получение координат 
             # Вид {start:[[start_coordinate_1],[start_coordinate_2]], end:[[end_coordinate_1],[end_coordinate_2]]}
             
             for key in coordinate_dict:
+                
                 point_name = "hole_" + str(key.split("_")[1])
                 start_coordinates.append(coordinate_dict[point_name]['start'])
                 end_coordinates.append(coordinate_dict[point_name]['end'])
-
+            
             self.point_dict = {'start':start_coordinates, 'end':end_coordinates}
-        
+            
         # В случае если подается не json а заготовленный словарь 
         elif self.input_coordinate_dict is not(None):
             self.point_dict = self.input_coordinate_dict
@@ -63,8 +70,12 @@ class Endoscope():
     def convertor_dict_coordinate_to_Vec3_coordinate(self,) -> dict:
         '''Необходим для предворительного конвртировния координат'''
         
+        phi_list = []
+        psi_list = []
+        
         vec_3_point_dict = {'start':[], 'end':[]}
         point_dict = self.point_dict
+        
         for index_hole in range(len(point_dict['start'])):
             
             start_point_coordinate = ursina.Vec3((float(point_dict['start'][index_hole]['X']), # получение начальной координаты по оси X
@@ -77,12 +88,17 @@ class Endoscope():
 
             vec_3_point_dict['start'].append(start_point_coordinate)
             vec_3_point_dict['end'].append(end_point_coordinate)
-        
+            
+            phi_list.append(point_dict['start'][index_hole]['phi'])
+            psi_list.append(point_dict['start'][index_hole]['psi'])   
+            
         self.vec_3_point_dict = vec_3_point_dict
         self.hole_counter = len(point_dict['start'])
         self.pints_counter = len(point_dict['start']) * 2 # так как у отверстия есть вход и выход
-     
-    
+        
+        self.phi_list = phi_list
+        self.psi_list = psi_list
+        
     # Получение координат точек c point_objects_list
     def get_point_objects_coordinate(self,) -> None:
         point_objects_list = self.point_objects_list
@@ -108,24 +124,40 @@ class Endoscope():
         self.coordinate_point_dict = coordinate_point_dict
         
         
-    # Создание эндоскопа
-    def create_endoscope(self, start_coordinate:dict, end_coordinate:dict):
-        
-        #  Вычисление смещения 
-        direction = np.subtract(np.array(end_coordinate), np.array(start_coordinate))
+    # Создание эндоскопа (длинй 300)
+    def create_endoscope(self, start_coordinate:dict=ursina.Vec3((0,0,0)),):
+    
         
         # Создание обьекта эндоскопа
-        endoscope = ursina.Entity(model=ursina.Cylinder(resolution=8,                 # Количество граней
-                                                        radius=self.radius_endoscope, # Конечная координата:tuple(x,y,z)
-                                                        height=self.len_endoscope,    # Длина обьекта
-                                                        direction=direction),         # Направление
-                                  position=(start_coordinate))                        # Позиция  начала
+        endoscope = ursina.Entity(model=ursina.Cylinder(resolution=8,                         # Количество граней
+                                                        radius=self.radius_endoscope,         # Конечная координата:tuple(x,y,z)
+                                                        height=self.len_endoscope,            # Длина обьекта
+                                                        ),
+                                                        color=ursina.color.orange,        
+                                                        position=(start_coordinate))          # Позиция  начала
         
-        return endoscope
+        
+        endoscope_list = []
+        endoscope_list.append(endoscope)
+        endoscope_list.append(ursina.Entity(model='sphere', scale=5,  position=(start_coordinate), color=ursina.color.pink))
+        
+        return endoscope_list
     
-    # Вычисление конечных координат эндоскопа
-    def calculate_end_coordinate_position_endoscope(self, start_coordinate_endoscope:dict, start coordinare):
-        pass
+    # Перемещение эндоскопа на заданную позицию
+    def moving_endoscope_to_input_coordinate(self,
+                                            endoscope:ursina.Entity,  
+                                            phi:float=0,
+                                            psi:float=90,
+                                            start_coordinate = (0,0,0),
+                                            end_coordinate = (0,0,0),):
+        
+        #endoscope = endoscope.rotate_x(alpha_angle)
+        endoscope.world_rotation = (phi,0,psi)
+        endoscope.world_position = start_coordinate
+        endoscope.animate_position(end_coordinate, duration=1, loop=True)
+
+        #return endoscope
+        
     
     # Основная функция
     def main(self,):
@@ -141,7 +173,13 @@ class Endoscope():
         
         # Получение координат точек для дальнейшего их соответсвия
         self.get_point_objects_coordinate()
-        print(1)
+        endoscope = self.create_endoscope()
+        
+        endoscope[0] = self.moving_endoscope_to_input_coordinate(endoscope=endoscope[0], 
+                                                                 start_coordinate=self.vec_3_point_dict['start'][0], 
+                                                                 end_coordinate=self.vec_3_point_dict['end'][0],
+                                                                 phi=self.phi_list[0],
+                                                                 psi=self.psi_list[0])
         
 
-        #return endoscope
+        return endoscope
