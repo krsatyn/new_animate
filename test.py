@@ -1,6 +1,25 @@
-from hole_center import Hole_center
+#visualization_script.py
+
+'''=====================>   Переделать под связи и эндоскоп    <=====================
+ursina.Entity(model=ursina.Pipe(base_shape=ursina.Circle()))
+'''
+
 import ursina
-import time
+import numpy as np
+
+from endoscope import Endoscope
+from hole_center import Hole_center
+
+'''Установка путей'''
+# Путь до модели
+model_path = 'src/stl/ImageToStl.com_p60k_301.stl'
+# Путь до json файла(центры отверстия)
+hole_center_coordinate_path = 'C:/A_work/new_animate/src/json/test_point.json'
+# Путь до json файла(Координат положения эндоскопа)
+endoscope_coordinate_path = 'C:/A_work/new_animate/src/json/test_end.json'
+
+'''Просмотр на отдельном отверстии'''
+hole_number = ""
 
 '''Основные настройки ursina'''
 ursina.window.title = "Визуализация"    
@@ -13,34 +32,19 @@ ursina.window.fps_counter.enable = False
 ursina.window.fullscreen = False
 
 
-coordinate_list = [[0.1, 0, 0]]
+'''Центы отверстий'''
+hc = Hole_center(json_path=hole_center_coordinate_path)
+object_point_list = hc.main()
 
-# def create_obj(to, i):
-#     to.coordi += i
-#     return to
+#encp = Endoscope(input_coordinate_dict={'start':[{'X':0, 'Y':0, 'Z':0}],
+#                                        'end':  [{'X':0, 'Y':20, 'Z':0}]})
 
-# def update():
-    
-#     for i in range(6):
-#         create_obj(to=test_obj, i=i)
-        
-    
+# Эндоскоп
+encp = Endoscope(json_path=endoscope_coordinate_path, point_objects_list=object_point_list)
+encp.main()
 
-#Стартовое положение
-starts = ursina.Entity(model='sphere', scale=5,  position=[0,30,0], color=ursina.color.green)
-
-#Ожидаемое конечное
-ends = ursina.Entity(model='sphere', scale=5,  position=[30,0,0], color=ursina.color.pink)
-# Испытыуемый
-test_obj = ursina.Entity(model=ursina.Cylinder(resolution=8, height=30, radius=2.5))
-
-test_obj.animate_position((10,0,0), duration=2, loop=True)
-
-#test_obj.world_rotation += (30,0,20)
-#test_obj.position = ends.position
-
-#Центр мира
-ursina.Entity(model='sphere', scale=5, color=ursina.color.red)
+# Деталь
+#detail = ursina.Entity(model=model_path, color = ursina.color.hsv(0, 0, 1, .5))
 
 # Камера 
 ursina.EditorCamera()

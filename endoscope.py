@@ -131,7 +131,7 @@ class Endoscope():
         # Создание обьекта эндоскопа
         endoscope = ursina.Entity(model=ursina.Cylinder(resolution=8,                         # Количество граней
                                                         radius=self.radius_endoscope,         # Конечная координата:tuple(x,y,z)
-                                                        height=self.len_endoscope,            # Длина обьекта
+                                                        height=-self.len_endoscope,            # Длина обьекта
                                                         ),
                                                         color=ursina.color.orange,        
                                                         position=(start_coordinate))          # Позиция  начала
@@ -154,7 +154,7 @@ class Endoscope():
         #endoscope = endoscope.rotate_x(alpha_angle)
         endoscope.world_rotation = (phi,0,psi)
         endoscope.world_position = start_coordinate
-        endoscope.animate_position(end_coordinate, duration=1, loop=True)
+        endoscope.animate_position(end_coordinate, duration=5, loop=True)
 
         #return endoscope
         
@@ -176,10 +176,10 @@ class Endoscope():
         endoscope = self.create_endoscope()
         
         endoscope[0] = self.moving_endoscope_to_input_coordinate(endoscope=endoscope[0], 
-                                                                 start_coordinate=self.vec_3_point_dict['start'][0], 
-                                                                 end_coordinate=self.vec_3_point_dict['end'][0],
-                                                                 phi=self.phi_list[0],
-                                                                 psi=self.psi_list[0])
+                                                                 start_coordinate=self.vec_3_point_dict['start'][-1], 
+                                                                 end_coordinate=self.vec_3_point_dict['end'][-1],
+                                                                 phi=self.psi_list[-1],
+                                                                 psi=self.phi_list[-1])
         
-
+    
         return endoscope
